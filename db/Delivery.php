@@ -66,7 +66,7 @@ class Delivery
                         join regions on(regions.id = deliveries.region_id)
                         where 
                           (deliveries.departure_date between '$startDate' and '$endDate') 
-                          and (deliveries.arrival_date between '$startDate' and '$endDate');
+                          or (deliveries.arrival_date between '$startDate' and '$endDate');
                         ")
             ->fetch_all(MYSQLI_ASSOC);
     }
