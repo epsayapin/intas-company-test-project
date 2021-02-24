@@ -1,13 +1,8 @@
 <?php
 
-//use mysqli;
+require_once "Db.php";
 
-$dbHost = 'localhost';
-$dbUser = 'zhenya';
-$dbPass = '222';
-$dbName = "intas_company_test_project";
-
-$conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
+$conn = Db::getConnection();
 
 $sql = 'drop table deliveries;';
 
