@@ -5,9 +5,7 @@ $( document ).ready(function () {
     arrivalDateInput = $("input[name='arrival_date']")
     addDeliveryForm = $(".js-add-delivery-form")
 
-    deliveriesFilterInputs = $(".js-filter-deliveries-by-date")
-    deliveriesFilterStartDateInput = $("#start_date")
-    deliveriesFilterEndDateInput = $("#end_date")
+    deliveriesFilterDateInput = $("#filter_date")
 
     deliveriesList = $("#deliveries_list")
     infoDiv = $("#info")
@@ -31,26 +29,26 @@ $( document ).ready(function () {
             data: $(this).serialize(),
             success: function (response) {
                 infoDiv.text(JSON.parse(response).text)
+                if (isDeliveryFilterDateSetuped()) {
+                    deliveriesFilterDateInput.trigger('change')
+                }
             }
         })
     })
 
-    deliveriesFilterInputs.change(function () {
+    deliveriesFilterDateInput.change(function () {
 
-        if(isDeliveryFiltersSetuped()) {
-            $.ajax({
-                url: getDeliveriesByDateRangeActionPath,
-                data: {
-                    start_date: deliveriesFilterStartDateInput.val(),
-                    end_date: deliveriesFilterEndDateInput.val()
-                },
-                type: "POST",
-                success: function (response) {
-                    clearDeliveriesList()
-                    fillDeliveriesList(JSON.parse(response))
-                }
-            });
-        }
+        $.ajax({
+            url: getDeliveriesByDateRangeActionPath,
+            data: {
+                filter_date: deliveriesFilterDateInput.val()
+            },
+            type: "POST",
+            success: function (response) {
+                clearDeliveriesList()
+                fillDeliveriesList(JSON.parse(response))
+            }
+        });
     })
 
     function clearDeliveriesList() {
@@ -89,16 +87,9 @@ $( document ).ready(function () {
         );
     }
     
-    function isDeliveryFiltersSetuped() {
+    function isDeliveryFilterDateSetuped() {
 
-        $setuped = true
-        deliveriesFilterInputs.each(function (i, input) {
-            if (input.value == "") {
-                $setuped = false
-            }
-        })
-
-        return $setuped
+        return deliveriesFilterDateInput.val() != ""
     }
 
     function calculateArrivalDate(departureDate, daysForDelivery) {

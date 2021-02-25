@@ -1,6 +1,6 @@
 <?php
 
-require_once "Db.php";
+require_once "db/Db.php";
 
 Db::getConnection()->query("drop table if exists deliveries");
 Db::getConnection()->query("drop table if exists regions");
@@ -76,6 +76,7 @@ function seedDeveliriesTable()
             $arrivalDate = $date->add(new DateInterval("P" . $daysForDelivery . "D"))->format("Y-m-d");
             $values[] = "({$courier['id']},{$regionId},'$currentDate','$arrivalDate')";
         }
+
         if (count($values) > 0) {
             Db::getConnection()->query($insertSql . implode(",", $values));
         }
@@ -84,8 +85,8 @@ function seedDeveliriesTable()
 
 function getDateRange($start, $end)
 {
-    return $dateRange = new DatePeriod(
-                new DateTime( $start),
+    return new DatePeriod(
+                new DateTime($start),
                 new DateInterval('P1D'),
                 new DateTime($end)
             );

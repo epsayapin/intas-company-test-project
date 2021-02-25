@@ -67,8 +67,7 @@
 
         <h2>Delivery Index</h2>
             Фильтр
-            <input type="date" id="start_date" class="js-filter-deliveries-by-date">
-            <input type="date" id="end_date" class="js-filter-deliveries-by-date">
+            <input type="date" id="filter_date" class="js-filter-deliveries-by-date">
 
             <ul id="deliveries_list">
             </ul>

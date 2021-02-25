@@ -2,11 +2,11 @@
 
 class Db
 {
-    public static function getConnection()
+    public static function getConnection() : mysqli
     {
         $dbHost = 'localhost';
-        $dbUser = 'zhenya';
-        $dbPass = '222';
+        $dbUser = 'root';
+        $dbPass = 'secret';
         $dbName = "intas_company_test_project";
 
         return new mysqli($dbHost, $dbUser, $dbPass, $dbName);

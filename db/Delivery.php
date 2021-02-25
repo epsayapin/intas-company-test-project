@@ -6,15 +6,18 @@ class Delivery
 {
     public static function createFromPost($post) : void
     {
-        Db::getConnection()->query("insert into deliveries values (
-                        {$post["courier_id"]}, 
-                        {$post["region_id"]}, 
-                        '{$post["departure_date"]}', 
-                        '{$post["arrival_date"]}'
-                    )
-                 ");
+        $conn = Db::getConnection();
+        $stmt = $conn->prepare("insert into deliveries values (?, ?, ?, ?)");
+        $stmt->bind_param(
+            'iiss',
+            $post["courier_id"],
+            $post["region_id"],
+            $post["departure_date"],
+            $post["arrival_date"]
+        );
+        $stmt->execute();
+        $stmt->close();
     }
-
     public static function getAll() : array
     {
         return Db::getConnection()->query("
@@ -28,7 +31,7 @@ class Delivery
             ->fetch_all(MYSQLI_ASSOC);
     }
 
-    public static function isCourierAvaibleForDateRange($courierId, $startDate, $endDate)
+    public static function isCourierAvaibleForDateRange($courierId, $startDate, $endDate) : bool
     {
         $query = "select count(*) 
                     from deliveries 
@@ -40,22 +43,10 @@ class Delivery
                           );
                   ";
 
-        return !(boolean)(Db::getConnection()->query($query)->fetch_all(MYSQLI_ASSOC))[0]["count(*)"];
+        return (boolean)(Db::getConnection()->query($query)->fetch_all(MYSQLI_ASSOC))[0]["count(*)"] == 0;
     }
 
-    public static function validatePost() : bool
-    {
-        return (isset($_POST["arrival_date"])
-                && isset($_POST["departure_date"])
-                && isset($_POST["arrival_date"])
-                && isset($_POST["courier_id"])
-                && ($_POST["courier_id"] > 0)
-                && isset($_POST["region_id"])
-                && ($_POST["region_id"] > 0)
-        );
-    }
-
-    public static function getByDateRange($startDate, $endDate) : array
+    public static function getByDate($filterDate) : array
     {
         return Db::getConnection()->query("
                         select deliveries.departure_date, deliveries.arrival_date, 
@@ -65,9 +56,25 @@ class Delivery
                         join couriers on(couriers.id = deliveries.courier_id)
                         join regions on(regions.id = deliveries.region_id)
                         where 
-                          (deliveries.departure_date between '$startDate' and '$endDate') 
-                          or (deliveries.arrival_date between '$startDate' and '$endDate');
+                          ('$filterDate' between deliveries.departure_date and deliveries.arrival_date) 
                         ")
             ->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function validateCreateByPost() : bool
+    {
+        return (isset($_POST["arrival_date"])
+            && isset($_POST["departure_date"])
+            && isset($_POST["arrival_date"])
+            && isset($_POST["courier_id"])
+            && ($_POST["courier_id"] > 0)
+            && isset($_POST["region_id"])
+            && ($_POST["region_id"] > 0)
+        );
+    }
+
+    public static function validateGetByDate() : bool
+    {
+        return (boolean)(strtotime($_POST["filter_date"]));
     }
 }

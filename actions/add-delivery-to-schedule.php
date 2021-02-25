@@ -2,7 +2,7 @@
 
 require_once ("../db/Delivery.php");
 
-if(! Delivery::validatePost()) {
+if(! Delivery::validateCreateByPost()) {
     echo json_encode([
         "text" => "Проверьте правильность указанных данных",
         "post" => $_POST,
